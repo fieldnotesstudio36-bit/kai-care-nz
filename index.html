@@ -525,80 +525,34 @@
             return result;
         }
 
-        // Fetch services from Google Sheets using CSV export (bypasses CORS)
         async function loadServicesFromSheet() {
-            console.log('🔵 loadServicesFromSheet() called!');
-            console.log('🔵 SHEET_ID:', SHEET_ID);
-            console.log('🔵 SHEET_NAME:', SHEET_NAME);
             try {
-                // Use CSV export URL - this bypasses CORS issues
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
-                console.log('📡 Fetching CSV from:', url);
+                // We use the new "Published" link that finally worked
+                const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vShhl35046lXVNAsV2xTxYeSlxOK7w2gGI9jSxS6-7ZkjwuizZrcuRKgrjmW70D6wmEhFCRPEmyquj4/pub?output=csv`;
                 
                 const response = await fetch(url);
-                console.log('📥 Response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`Sheet not accessible. Status: ${response.status}. Make sure the sheet is public!`);
-                }
-                
                 const csvText = await response.text();
-                console.log('📄 CSV received, length:', csvText.length);
-                console.log('📄 First 200 chars:', csvText.substring(0, 200));
                 
-                // Parse CSV
-                const lines = csvText.split('\n');
-                console.log(`📊 Found ${lines.length} lines in CSV`);
-                
-                // Skip header row, parse data rows
-                SERVICES = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue; // Skip empty lines
-                    
-                    // Parse CSV line (handles quoted fields with commas)
-                    const fields = parseCSVLine(line);
-                    
-                    if (fields.length >= 9) {
-                        SERVICES.push({
-                            id: parseInt(fields[0]) || i,
-                            name: fields[1] || '',
-                            category: fields[2] || '',
-                            city: fields[3] || '',
-                            address: fields[4] || '',
-                            phone: fields[5] || '',
-                            hours: fields[6] || '',
-                            notes: fields[7] || '',
-                            image: fields[8] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-                            website: fields[9] || ''
-                        });
-                    }
-                }
-                
-                console.log(`✅ Loaded ${SERVICES.length} services from Google Sheets`);
-                console.log('First 3 services:', SERVICES.slice(0, 3));
+                const lines = csvText.split('\n').slice(1);
+                SERVICES = lines.map((line, index) => {
+                    const f = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    return {
+                        id: index,
+                        name: f[1]?.replace(/"/g,''),      // Matches your card titles
+                        category: f[2]?.replace(/"/g,''),  // Matches your categories
+                        city: f[3]?.replace(/"/g,''),      // Matches your city filter
+                        address: f[4]?.replace(/"/g,''),   // Needed for your Map Pins
+                        notes: f[7]?.replace(/"/g,''),     // Matches your card descriptions
+                        image: f[8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+                        link: f[9]?.replace(/"/g,'')       // For your website buttons
+                    };
+                }).filter(s => s.name);
+        
+                console.log("Data successfully synced with Sheets");
+                render(); // This triggers your original pins and buttons to draw
+            } catch (e) {
+                console.error("Connection error", e);
                 render();
-            } catch (error) {
-                console.error('❌ Error loading services:', error);
-                document.getElementById('app').innerHTML = `
-                    <div style="text-align: center; padding: 50px; color: white; max-width: 800px; margin: 0 auto;">
-                        <h2>⚠️ Could not load services</h2>
-                        <p style="margin: 20px 0;">Please check:</p>
-                        <ul style="text-align: left; line-height: 2; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;">
-                            <li><strong>Sheet is public:</strong> Click Share → "Anyone with the link" → "Viewer"</li>
-                            <li><strong>Sheet tab is named "Services"</strong> (check bottom left of your spreadsheet)</li>
-                            <li><strong>Data starts from Row 1</strong> (headers in row 1, data from row 2)</li>
-                            <li><strong>Internet connection</strong> is working</li>
-                        </ul>
-                        <div style="margin-top: 30px; padding: 20px; background: rgba(255,0,0,0.2); border-radius: 8px;">
-                            <p style="font-weight: bold; margin-bottom: 10px;">Technical Error:</p>
-                            <p style="font-size: 0.9rem;">${error.message}</p>
-                        </div>
-                        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
-                            Press F12 to open console for more details
-                        </p>
-                    </div>
-                `;
             }
         }
 

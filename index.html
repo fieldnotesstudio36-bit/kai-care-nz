@@ -9,50 +9,624 @@
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=180&q=80">
     <title>Kai & Care NZ - Find Help Near You</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #1a2332; color: #333; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-        .header { text-align: center; margin-bottom: 50px; }
-        .header h1 { font-size: 3rem; color: white; margin-bottom: 15px; font-weight: 700; }
-        .header p { font-size: 1.4rem; color: rgba(255,255,255,0.9); }
-        .city-selector { max-width: 600px; margin: 0 auto 50px; }
-        .city-selector select { width: 100%; padding: 20px; font-size: 1.3rem; border: 3px solid #ddd; border-radius: 12px; background: white; cursor: pointer; font-weight: 600; }
-        .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-bottom: 50px; }
-        .category-card { position: relative; height: 300px; border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .category-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
-        .category-card img { width: 100%; height: 100%; object-fit: cover; }
-        .category-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3)); padding: 30px; color: white; }
-        .category-card .emoji { font-size: 3rem; margin-bottom: 10px; display: block; }
-        .category-card h2 { font-size: 2rem; font-weight: 700; margin-bottom: 5px; letter-spacing: 0.05em; }
-        .category-card p { font-size: 1.1rem; opacity: 0.9; }
-        .back-button { display: inline-flex; align-items: center; gap: 10px; padding: 15px 30px; font-size: 1.2rem; font-weight: 600; background: #667eea; color: white; border: none; border-radius: 12px; cursor: pointer; margin-bottom: 30px; }
-        .services-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-        .service-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s ease; }
-        .service-card:hover { transform: translateY(-6px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .service-card img { width: 100%; height: 200px; object-fit: cover; }
-        .service-card-content { padding: 20px; }
-        .service-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: #333; }
-        .service-card p { color: #666; font-size: 1.05rem; line-height: 1.5; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .day-column { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .day-column h3 { font-size: 1.6rem; color: #667eea; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #667eea; }
-        .meal-entry { background: #f9f9f9; padding: 18px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid #ff9800; }
-        .meal-name { font-size: 1.2rem; font-weight: 700; color: #333; margin-bottom: 8px; }
-        .meal-info { font-size: 1.05rem; color: #666; }
-        .suggest-button { position: fixed; bottom: 30px; right: 30px; padding: 20px 35px; font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); z-index: 100; }
-        .donate-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 50px 40px; text-align: center; color: white; margin-top: 60px; }
-        .donate-btn { background: white; color: #667eea; padding: 15px 30px; border-radius: 12px; border: none; font-weight: 700; margin: 10px; cursor: pointer; }
-        @media (max-width: 768px) { .category-grid { grid-template-columns: 1fr; } .header h1 { font-size: 2rem; } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a2332;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        /* City Selector */
+        .city-selector {
+            max-width: 600px;
+            margin: 0 auto 50px;
+        }
+        
+        .city-selector select {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3rem;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        /* Category Grid - Image Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .category-card {
+            position: relative;
+            height: 300px;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        }
+        
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+            padding: 30px;
+            color: white;
+        }
+        
+        .category-card .emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .category-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.05em;
+        }
+        
+        .category-card p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: background 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #5568d3;
+        }
+        
+        /* Services List Page */
+        .services-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .service-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .service-card-content {
+            padding: 20px;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .service-card p {
+            color: #666;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+        
+        /* Service Detail Page */
+        .service-detail {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .service-detail img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .service-detail-content {
+            padding: 40px;
+        }
+        
+        .service-detail h2 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .detail-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.2rem;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-item strong {
+            min-width: 120px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .detail-item span {
+            color: #333;
+            flex: 1;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #45a049;
+        }
+        
+        /* Food Calendar */
+        .calendar-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .calendar-header h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .day-column {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .day-column h3 {
+            font-size: 1.6rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .meal-entry {
+            background: #f9f9f9;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ff9800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .meal-entry:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+        
+        .meal-entry:last-child {
+            margin-bottom: 0;
+        }
+        
+        .meal-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .meal-info {
+            font-size: 1.05rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .empty-day {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+        
+        /* Suggest Button */
+        .suggest-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 20px 35px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .suggest-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* Donate Section */
+        .donate-section {
+            margin: 60px auto;
+            max-width: 700px;
+        }
+        
+        .donate-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .donate-card h2 {
+            font-size: 2.2rem;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .donate-card p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .donate-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .donate-btn {
+            background: white;
+            color: #667eea;
+            padding: 18px 40px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .donate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        }
+        
+        .donate-btn-custom {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .donate-weekly {
+            border-top: 2px solid rgba(255,255,255,0.3);
+            padding-top: 25px;
+        }
+        
+        .donate-weekly p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .donate-btn-weekly {
+            background: #4caf50;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .donate-btn-weekly:hover {
+            background: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .category-card {
+                height: 250px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .services-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="app"></div>
-    <button class="suggest-button" onclick="window.open('https://docs.google.com/forms/d/11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8', '_blank')">➕ Suggest Service</button>
-
+    <button class="suggest-button" onclick="suggestService()">➕ Suggest Service</button>
+    
     <script>
-        const SHEET_ID = '11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8';
+        // === DATA - EDIT THIS TO ADD SERVICES ===
+        // ====================
+// KAI & CARE NZ - COMPLETE SERVICES DATA
+// Copy this entire section to replace your SERVICES array in app-v2.html
+// ====================
+
+// GOOGLE SHEETS CONFIGURATION
+        const SHEET_ID = '11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8';  // Elena's Kai & Care NZ Sheet
         const SHEET_NAME = 'Services';
-        let SERVICES = [];
+        let SERVICES = [];  // Will be populated from Google Sheets
+
+        // CSV parser helper function
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Fetch services from Google Sheets using CSV export (bypasses CORS)
+        async function loadServicesFromSheet() {
+            console.log('🔵 loadServicesFromSheet() called!');
+            console.log('🔵 SHEET_ID:', SHEET_ID);
+            console.log('🔵 SHEET_NAME:', SHEET_NAME);
+            try {
+                // Use CSV export URL - this bypasses CORS issues
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+                console.log('📡 Fetching CSV from:', url);
+                
+                const response = await fetch(url);
+                console.log('📥 Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`Sheet not accessible. Status: ${response.status}. Make sure the sheet is public!`);
+                }
+                
+                const csvText = await response.text();
+                console.log('📄 CSV received, length:', csvText.length);
+                console.log('📄 First 200 chars:', csvText.substring(0, 200));
+                
+                // Parse CSV
+                const lines = csvText.split('\n');
+                console.log(`📊 Found ${lines.length} lines in CSV`);
+                
+                // Skip header row, parse data rows
+                SERVICES = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue; // Skip empty lines
+                    
+                    // Parse CSV line (handles quoted fields with commas)
+                    const fields = parseCSVLine(line);
+                    
+                    if (fields.length >= 9) {
+                        SERVICES.push({
+                            id: parseInt(fields[0]) || i,
+                            name: fields[1] || '',
+                            category: fields[2] || '',
+                            city: fields[3] || '',
+                            address: fields[4] || '',
+                            phone: fields[5] || '',
+                            hours: fields[6] || '',
+                            notes: fields[7] || '',
+                            image: fields[8] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+                            website: fields[9] || ''
+                        });
+                    }
+                }
+                
+                console.log(`✅ Loaded ${SERVICES.length} services from Google Sheets`);
+                console.log('First 3 services:', SERVICES.slice(0, 3));
+                render();
+            } catch (error) {
+                console.error('❌ Error loading services:', error);
+                document.getElementById('app').innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: white; max-width: 800px; margin: 0 auto;">
+                        <h2>⚠️ Could not load services</h2>
+                        <p style="margin: 20px 0;">Please check:</p>
+                        <ul style="text-align: left; line-height: 2; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 12px;">
+                            <li><strong>Sheet is public:</strong> Click Share → "Anyone with the link" → "Viewer"</li>
+                            <li><strong>Sheet tab is named "Services"</strong> (check bottom left of your spreadsheet)</li>
+                            <li><strong>Data starts from Row 1</strong> (headers in row 1, data from row 2)</li>
+                            <li><strong>Internet connection</strong> is working</li>
+                        </ul>
+                        <div style="margin-top: 30px; padding: 20px; background: rgba(255,0,0,0.2); border-radius: 8px;">
+                            <p style="font-weight: bold; margin-bottom: 10px;">Technical Error:</p>
+                            <p style="font-size: 0.9rem;">${error.message}</p>
+                        </div>
+                        <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+                            Press F12 to open console for more details
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        const FOOD_CALENDAR = {
+            Monday: [
+                { name: "Nelson City Mission Lunch", time: "12:00pm - 1:30pm", price: "Free", location: "46 Waimea Road", serviceId: 1 },
+                { name: "Salvation Army Dinner", time: "5:00pm - 6:30pm", price: "Koha", location: "18 Selwyn Place", serviceId: 2 }
+            ],
+            Tuesday: [
+                { name: "St John's Community Kai", time: "6:00pm - 7:00pm", price: "Free", location: "3 Vanguard Street" }
+            ],
+            Wednesday: [
+                { name: "Nelson City Mission Lunch", time: "12:00pm - 1:30pm", price: "Free", location: "46 Waimea Road", serviceId: 1 }
+            ],
+            Thursday: [
+                { name: "Elim Church Meal", time: "5:00pm - 6:30pm", price: "Free", location: "26 Halifax Street" }
+            ],
+            Friday: [
+                { name: "Nelson City Mission Lunch", time: "12:00pm - 1:30pm", price: "Free", location: "46 Waimea Road", serviceId: 1 },
+                { name: "Salvation Army Dinner", time: "5:00pm - 6:30pm", price: "Koha", location: "18 Selwyn Place", serviceId: 2 }
+            ],
+            Saturday: [
+                { name: "Cathedral Breakfast", time: "9:00am - 10:30am", price: "Free", location: "Trafalgar Square" }
+            ],
+            Sunday: [
+                { name: "Victory Centre Roast", time: "12:30pm - 2:00pm", price: "$4", location: "Rutherford Park" }
+            ]
+        };
 
         const CATEGORIES = [
             { id: 'Community', emoji: '📚', name: 'COMMUNITY', subtitle: 'Libraries & warm spaces', image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80' },
@@ -66,79 +640,437 @@
             { id: 'Employment', emoji: '💼', name: 'WORK', subtitle: 'Job support', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80' }
         ];
 
-        const FOOD_CALENDAR = {
-            Monday: [{ name: "Nelson City Mission Lunch", time: "12:00pm - 1:30pm", location: "46 Waimea Road" }],
-            Tuesday: [{ name: "St John's Community Kai", time: "6:00pm - 7:00pm", location: "3 Vanguard Street" }],
-            Wednesday: [{ name: "Nelson City Mission Lunch", time: "12:00pm - 1:30pm", location: "46 Waimea Road" }],
-            Thursday: [{ name: "Elim Church Meal", time: "5:00pm - 6:30pm", location: "26 Halifax Street" }],
-            Friday: [{ name: "Salvation Army Dinner", time: "5:00pm - 6:30pm", location: "18 Selwyn Place" }],
-            Saturday: [{ name: "Cathedral Breakfast", time: "9:00am - 10:30am", location: "Trafalgar Square" }],
-            Sunday: [{ name: "Victory Centre Roast", time: "12:30pm - 2:00pm", location: "Rutherford Park" }]
-        };
+        const CITIES = ['All Cities', 'Auckland', 'Wellington', 'Christchurch', 'Nelson', 'Hamilton'];
 
+        // === APP STATE ===
         let currentPage = 'home';
         let selectedCity = 'All Cities';
         let selectedCategory = null;
+        let selectedService = null;
 
-        async function loadServicesFromSheet() {
-            try {
-                const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vShhl35046lXVNAsV2xTxYeSlxOK7w2gGI9jSxS6-7ZkjwuizZrcuRKgrjmW70D6wmEhFCRPEmyquj4/pub?gid=0&single=true&output=csv`;
-                const response = await fetch(url);
-                const csvText = await response.text();
-                const lines = csvText.split('\n').slice(1);
-                SERVICES = lines.map(line => {
-                    const f = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { name: f[1]?.replace(/"/g,''), category: f[2]?.replace(/"/g,''), city: f[3]?.replace(/"/g,''), notes: f[7]?.replace(/"/g,''), image: f[8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80' };
-                }).filter(s => s.name);
-                render();
-            } catch (e) { console.error("Data load failed", e); render(); }
-        }
-
+        // === RENDER FUNCTIONS ===
         function render() {
             const app = document.getElementById('app');
-            if (currentPage === 'home') app.innerHTML = renderHome();
-            else if (currentPage === 'category') app.innerHTML = renderCategoryPage();
+            
+            if (currentPage === 'home') {
+                app.innerHTML = renderHome();
+            } else if (currentPage === 'category') {
+                app.innerHTML = renderCategoryPage();
+            } else if (currentPage === 'service') {
+                app.innerHTML = renderServiceDetail();
+            } else if (currentPage === 'calendar') {
+                app.innerHTML = renderFoodCalendar();
+            }
         }
 
         function renderHome() {
             return `
                 <div class="container">
-                    <div class="header"><h1>Kai & Care NZ</h1><p>Kia ora! Find help near you</p></div>
+                    <div class="header">
+                        <h1>Kai & Care NZ</h1>
+                        <p>Kia ora! Find help near you</p>
+                    </div>
+                    
+                    <div class="city-selector">
+                        <select onchange="changeCity(this.value)">
+                            ${CITIES.map(city => `
+                                <option value="${city}" ${city === selectedCity ? 'selected' : ''}>
+                                    📍 ${city}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
                     <div class="category-grid">
                         ${CATEGORIES.map(cat => `
                             <div class="category-card" onclick="openCategory('${cat.id}')">
-                                <img src="${cat.image}"><div class="category-overlay"><span class="emoji">${cat.emoji}</span><h2>${cat.name}</h2><p>${cat.subtitle}</p></div>
-                            </div>`).join('')}
+                                <img src="${cat.image}" alt="${cat.name}">
+                                <div class="category-overlay">
+                                    <span class="emoji">${cat.emoji}</span>
+                                    <h2>${cat.name}</h2>
+                                    <p>${cat.subtitle}</p>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div style="border-radius: 20px; overflow: hidden; margin-top: 50px;">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d188046.22384666576!2d173.11186255!3d-41.289139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d3becc24375b47b%3A0x500ef6143a29910!2sNelson!5e0!3m2!1sen!2snz!4v1700000000000" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    
+                    <!-- Map Section -->
+                    <div style="margin: 60px auto; max-width: 1200px;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h2 style="font-size: 2.5rem; color: white; margin-bottom: 10px;">🗺️ Find Services Near You</h2>
+                            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.9);">Explore all Nelson-Richmond-Motueka services on the map</p>
+                        </div>
+                        <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
+                            <iframe src="https://www.google.com/maps/d/u/3/embed?mid=16_VCwWX2XEQB80A4PjEy3OntcNVL8zo&ehbc=2E312F&noprof=1" width="100%" height="600" style="border: none;"></iframe>
+                        </div>
                     </div>
-                    <div class="donate-card"><h2>💝 Support Kai & Care NZ</h2><p>Help us keep this service free.</p><button class="donate-btn">$2</button><button class="donate-btn">$10</button></div>
-                </div>`;
+                    
+                    <!-- Donate Section -->
+                    <div class="donate-section">
+                        <div class="donate-card">
+                            <h2>💝 Support Kai & Care NZ</h2>
+                            <p>We do our best to keep this free for everyone. If you love what we do, help us keep going!</p>
+                            
+                            <div class="donate-buttons">
+                                <button class="donate-btn" onclick="donate(2)">$2</button>
+                                <button class="donate-btn" onclick="donate(10)">$10</button>
+                                <button class="donate-btn donate-btn-custom" onclick="donateCustom()">Other Amount</button>
+                            </div>
+                            
+                            <div class="donate-weekly">
+                                <p>Or become a regular supporter:</p>
+                                <button class="donate-btn-weekly" onclick="donateWeekly()">$5/month</button>
+                            </div>
+                            
+                            <p style="font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-top: 15px;">Every dollar helps us maintain and expand this service</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function renderCategoryPage() {
-            const cat = CATEGORIES.find(c => c.id === selectedCategory);
-            const filtered = SERVICES.filter(s => s.category === selectedCategory);
-            
-            let content = `<button class="back-button" onclick="goHome()">← Back</button><div class="header"><h1>${cat.emoji} ${cat.name}</h1></div>`;
-            
+            const categoryInfo = CATEGORIES.find(c => c.id === selectedCategory);
+            const filteredServices = SERVICES.filter(s => {
+                const cityMatch = selectedCity === 'All Cities' || s.city === selectedCity;
+                return s.category === selectedCategory && cityMatch;
+            });
+
+            // Special handling for Food category - show calendar first
             if (selectedCategory === 'Food') {
-                content += `<div class="calendar-grid">${Object.keys(FOOD_CALENDAR).map(day => `
-                    <div class="day-column"><h3>${day}</h3>${FOOD_CALENDAR[day].map(m => `
-                        <div class="meal-entry"><div class="meal-name">${m.name}</div><div class="meal-info">🕒 ${m.time}<br>📍 ${m.location}</div></div>`).join('')}
-                    </div>`).join('')}</div><h2 style="color:white; margin: 40px 0 20px; text-align:center;">Food Banks & Pantries</h2>`;
+                return renderFoodCalendar();
             }
 
-            content += `<div class="services-list">${filtered.map(s => `
-                <div class="service-card"><img src="${s.image}"><div class="service-card-content"><h3>${s.name}</h3><p>📍 ${s.city}</p><p>${s.notes || ''}</p></div></div>`).join('')}</div>`;
-            return `<div class="container">${content}</div>`;
+            return `
+                <div class="container">
+                    <button class="back-button" onclick="goHome()">
+                        ← Back to Menu
+                    </button>
+                    
+                    <div class="header">
+                        <h1>${categoryInfo.emoji} ${categoryInfo.name}</h1>
+                        <p>${selectedCity === 'All Cities' ? 'All locations' : selectedCity}</p>
+                    
+            
+            ${selectedCategory.id === 'Health' ? `
+            <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h2 style="font-size: 2rem; color: #667eea; margin-bottom: 20px; text-align: center;">🚨 National Helplines - Free & Confidential</h2>
+                
+                <div style="background: #fff5f5; padding: 20px; border-radius: 12px; border-left: 5px solid #f44336; margin-bottom: 20px;">
+                    <h3 style="color: #f44336; font-size: 1.4rem; margin-bottom: 15px;">EMERGENCY</h3>
+                    <div style="font-size: 1.2rem; line-height: 2;">
+                        <strong>111</strong> - Police, Fire, Ambulance<br>
+                        <strong>0800 764 766</strong> - Poison Centre (24/7)
+                    </div>
+                </div>
+
+                <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 5px solid #2196f3; margin-bottom: 20px;">
+                    <h3 style="color: #2196f3; font-size: 1.4rem; margin-bottom: 15px;">MENTAL HEALTH & CRISIS</h3>
+                    <div style="font-size: 1.1rem; line-height: 1.8;">
+                        <strong>1737</strong> - Need to Talk (call or text, 24/7)<br>
+                        <strong>0800 543 354</strong> - Lifeline (24/7)<br>
+                        <strong>0508 828 865</strong> - Suicide Crisis Helpline (24/7)<br>
+                        <strong>0800 111 757</strong> - Depression Helpline<br>
+                        <strong>0800 726 666</strong> - Samaritans (24/7)<br>
+                        <strong>0800 376 633</strong> - Youthline (text 234)
+                    </div>
+                </div>
+
+                <div style="background: #fff3f0; padding: 20px; border-radius: 12px; border-left: 5px solid #ff5722; margin-bottom: 20px;">
+                    <h3 style="color: #ff5722; font-size: 1.4rem; margin-bottom: 15px;">FAMILY VIOLENCE</h3>
+                    <div style="font-size: 1.1rem; line-height: 1.8;">
+                        <strong>0800 733 843</strong> - Women's Refuge (24/7)<br>
+                        <strong>0800 456 450</strong> - Family Violence Info Line<br>
+                        <strong>0800 742 584</strong> - Shakti (migrant women)<br>
+                        <strong>0508 744 633</strong> - Shine
+                    </div>
+                </div>
+
+                <div style="background: #f3f0ff; padding: 20px; border-radius: 12px; border-left: 5px solid #9c27b0; margin-bottom: 20px;">
+                    <h3 style="color: #9c27b0; font-size: 1.4rem; margin-bottom: 15px;">OTHER SUPPORT</h3>
+                    <div style="font-size: 1.1rem; line-height: 1.8;">
+                        <strong>0800 044 334</strong> - Safe to Talk (sexual harm, 24/7)<br>
+                        <strong>0800 787 797</strong> - Alcohol Drug Helpline (text 8681)<br>
+                        <strong>0800 654 655</strong> - Gambling Helpline (text 8006)<br>
+                        <strong>0800 688 5463</strong> - OUTLine (LGBTQ+, 6pm-9pm)
+                    </div>
+                </div>
+
+                <p style="text-align: center; color: #666; font-size: 1.1rem; margin-top: 20px;">
+                    All helplines are free and confidential. You are not alone. 💙
+                </p>
+            </div>
+
+            <h2 style="color: white; font-size: 2rem; margin: 30px 0 20px; text-align: center;">
+                Nelson-Richmond-Motueka Health Services
+            </h2>
+            ` : ''}
+
+            ${selectedCategory.id === 'Legal' ? `
+            <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h2 style="font-size: 2rem; color: #667eea; margin-bottom: 20px;">⚖️ Justice of the Peace (JP) - FREE Services</h2>
+                
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="font-size: 1.4rem; color: #333; margin-bottom: 15px;">What JPs Can Do (All Free!):</h3>
+                    <ul style="font-size: 1.1rem; line-height: 2; color: #666;">
+                        <li>✓ Certify copies of documents</li>
+                        <li>✓ Witness signatures</li>
+                        <li>✓ Administer oaths and declarations</li>
+                        <li>✓ All services completely FREE</li>
+                    </ul>
+                </div>
+
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 12px;">
+                    <h3 style="font-size: 1.4rem; color: #333; margin-bottom: 15px;">How to Find a JP:</h3>
+                    <ol style="font-size: 1.1rem; line-height: 2; color: #666;">
+                        <li>Visit <a href="https://justiceofthepeace.org.nz" target="_blank" style="color: #4caf50;">justiceofthepeace.org.nz</a> and search by location</li>
+                        <li>Check Nelson Public Library or Richmond Library websites for JP service times</li>
+                        <li>Citizens Advice Bureau often has JPs available</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h2 style="color: white; font-size: 2rem; margin: 30px 0 20px; text-align: center;">
+                Nelson Legal Support Services
+            </h2>
+            ` : ''}
+            
+            <div class="services-list">
+                        ${filteredServices.length > 0 ? filteredServices.map(service => `
+                            <div class="service-card" onclick="openService(${service.id})">
+                                <img src="${service.image}" alt="${service.name}">
+                                <div class="service-card-content">
+                                    <h3>${service.name}</h3>
+                                    <p>📍 ${service.address}</p>
+                                    <p>⏰ ${service.hours}</p>
+                                </div>
+                            </div>
+                        `).join('') : `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">
+                                <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
+                                <p style="font-size: 1.3rem;">No services found in ${selectedCity}</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
         }
 
-        function openCategory(id) { selectedCategory = id; currentPage = 'category'; render(); }
-        function goHome() { currentPage = 'home'; render(); }
+        function renderServiceDetail() {
+            const service = SERVICES.find(s => s.id === selectedService);
+            if (!service) return '';
 
-        window.onload = loadServicesFromSheet;
+            return `
+                <div class="container">
+                    <button class="back-button" onclick="goBack()">
+                        ← Back
+                    </button>
+                    
+                    <div class="service-detail">
+                        <img src="${service.image}" alt="${service.name}">
+                        <div class="service-detail-content">
+                            <h2>${service.name}</h2>
+                            
+                            ${service.address ? `
+                                <div class="detail-item">
+                                    <strong>📍 Address</strong>
+                                    <span>${service.address}, ${service.city}</span>
+                                </div>
+                            ` : ''}
+                            
+                            ${service.hours ? `
+                                <div class="detail-item">
+                                    <strong>⏰ Hours</strong>
+                                    <span>${service.hours}</span>
+                                </div>
+                            ` : ''}
+                            
+                            ${service.phone ? `
+                                <div class="detail-item">
+                                    <strong>📞 Phone</strong>
+                                    <span>${service.phone}</span>
+                                </div>
+                            ` : ''}
+                            
+                            ${service.notes ? `
+                                <div class="detail-item">
+                                    <strong>ℹ️ Notes</strong>
+                                    <span>${service.notes}</span>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="action-buttons">
+                                ${service.address ? `
+                                    <button class="btn btn-primary" onclick="getDirections('${service.address}', '${service.city}')">
+                                        🗺️ Directions / Ara
+                                    </button>
+                                ` : ''}
+                                ${service.phone ? `
+                                    <button class="btn btn-secondary" onclick="callPhone('${service.phone}')">
+                                        📞 Waea / Call
+                                    </button>
+                                ` : ''}
+                                    ${service.website ? `
+                                    <button class="btn btn-secondary" onclick="window.open('${service.website}', '_blank')" style="background: #4caf50;">
+                                        🌐 Visit Website
+                                    </button>
+                                    ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFoodCalendar() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            
+            return `
+                <div class="container">
+                    <button class="back-button" onclick="goHome()">
+                        ← Back to Menu
+                    </button>
+                    
+                    <div class="calendar-header">
+                        <h2>🍲 Weekly Food Schedule</h2>
+                        <p style="font-size: 1.2rem; color: #666;">Click any meal for more details</p>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        ${days.map(day => `
+                            <div class="day-column">
+                                <h3>${day}</h3>
+                                ${FOOD_CALENDAR[day] && FOOD_CALENDAR[day].length > 0 ? 
+                                    FOOD_CALENDAR[day].map(meal => `
+                                        <div class="meal-entry" onclick="${meal.serviceId ? `openService(${meal.serviceId})` : ''}">
+                                            <div class="meal-name">${meal.name}</div>
+                                            <div class="meal-info">⏰ ${meal.time}</div>
+                                            <div class="meal-info" style="color: #4caf50; font-weight: 600;">💰 ${meal.price}</div>
+                                            <div class="meal-info">📍 ${meal.location}</div>
+                                        </div>
+                                    `).join('') 
+                                    : 
+                                    '<div class="empty-day">No meals scheduled</div>'
+                                }
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 50px;">
+                        <button class="btn btn-primary" onclick="showFoodServices()">
+                            📍 View All Food Services
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // === NAVIGATION FUNCTIONS ===
+        function goHome() {
+            currentPage = 'home';
+            selectedCategory = null;
+            selectedService = null;
+            render();
+        }
+
+        function goBack() {
+            if (currentPage === 'service') {
+                currentPage = 'category';
+                selectedService = null;
+            } else {
+                goHome();
+            }
+            render();
+        }
+
+        function changeCity(city) {
+            selectedCity = city;
+            render();
+        }
+
+        function openCategory(categoryId) {
+            selectedCategory = categoryId;
+            currentPage = categoryId === 'Food' ? 'calendar' : 'category';
+            render();
+        }
+
+        function openService(serviceId) {
+            selectedService = serviceId;
+            currentPage = 'service';
+            render();
+        }
+
+        function showFoodServices() {
+            currentPage = 'category';
+            render();
+        }
+
+        function getDirections(address, city) {
+            const query = encodeURIComponent(`${address}, ${city}, New Zealand`);
+            window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+        }
+
+        function callPhone(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        function suggestService() {
+            const subject = 'New Service Suggestion';
+            const body = `
+I would like to suggest a new service for the Community Services NZ directory:
+
+Service Name: 
+Category: 
+City: 
+Address: 
+Phone: 
+Hours: 
+Notes: 
+
+My Email: 
+            `.trim();
+            
+            // ELENA: Replace with your email
+            window.location.href = `mailto:YOUR_EMAIL@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+        
+        // DONATION FUNCTIONS
+        function donate(amount) {
+            // Different Stripe links for different amounts
+            const links = {
+                2: 'https://buy.stripe.com/14AcN4861awP505dHs7IY03',
+                10: 'https://buy.stripe.com/dRmaEWae96gzakp6f07IY02'
+            };
+            window.open(links[amount], '_blank');
+        }
+        
+        function donateCustom() {
+            // $50 adjustable amount link
+            window.open('https://buy.stripe.com/9B6dR84TP5cvakp7j47IY04', '_blank');
+        }
+        
+        function donateWeekly() {
+            // $5/month recurring subscription
+            window.open('https://buy.stripe.com/9B66oG1HD6gz0JPbzk7IY01', '_blank');
+        }
+
+        // Initialize app - Load from Google Sheets
+        console.log('🚀 App starting...');
+        document.getElementById('app').innerHTML = `
+            <div style="text-align: center; padding: 100px 20px; color: white;">
+                <h1 style="font-size: 3rem; margin-bottom: 20px;">Kai & Care NZ</h1>
+                <p style="font-size: 1.5rem; margin-bottom: 30px;">Loading services from Google Sheets...</p>
+                <div style="font-size: 3rem;">⏳</div>
+            </div>
+        `;
+        loadServicesFromSheet();
+
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/kai-care-nz/service-worker.js')
+                .then(() => console.log('✅ Service Worker registered'))
+                .catch((error) => console.log('Service Worker registration failed:', error));
+        }
     </script>
 </body>
 </html>

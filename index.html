@@ -455,6 +455,37 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 18px rgba(0,0,0,0.3);
         }
+
+        /* Install Banner for Android */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .install-banner.show {
+            display: block;
+        }
+
+        .install-banner button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px 0;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -478,24 +509,35 @@
             .calendar-grid {
                 grid-template-columns: 1fr;
             }
+
+            .suggest-button {
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div id="app"></div>
+    
+    <!-- Install Banner for Android -->
+    <div id="installBanner" class="install-banner">
+        <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>📱 Install Kai & Care NZ</strong></p>
+        <p style="font-size: 1rem; margin-bottom: 10px;">Add this app to your home screen for easy access!</p>
+        <button onclick="installApp()">Install Now</button>
+        <button onclick="dismissBanner()" style="background: transparent; border: 2px solid white; color: white;">Maybe Later</button>
+    </div>
+
+    <button class="suggest-button" onclick="shareApp()" style="bottom: 100px; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);">📤 Share</button>
     <button class="suggest-button" onclick="suggestService()">➕ Suggest Service</button>
     
     <script>
-        // === DATA - EDIT THIS TO ADD SERVICES ===
-        // ====================
-// KAI & CARE NZ - COMPLETE SERVICES DATA
-// Copy this entire section to replace your SERVICES array in app-v2.html
-// ====================
-
-// GOOGLE SHEETS CONFIGURATION
-        const SHEET_ID = '11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8';  // Elena's Kai & Care NZ Sheet
+        // GOOGLE SHEETS CONFIGURATION
+        const SHEET_ID = '11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8';
         const SHEET_NAME = 'Services';
-        let SERVICES = [];  // Will be populated from Google Sheets
+        let SERVICES = [];
 
         // CSV parser helper function
         function parseCSVLine(line) {
@@ -510,7 +552,7 @@
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
                         current += '"';
-                        i++; // Skip next quote
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
@@ -527,7 +569,6 @@
 
         async function loadServicesFromSheet() {
             try {
-                // We use the new "Published" link that finally worked
                 const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vShhl35046lXVNAsV2xTxYeSlxOK7w2gGI9jSxS6-7ZkjwuizZrcuRKgrjmW70D6wmEhFCRPEmyquj4/pub?output=csv`;
                 
                 const response = await fetch(url);
@@ -538,20 +579,22 @@
                     const f = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return {
                         id: index,
-                        name: f[1]?.replace(/"/g,''),      // Matches your card titles
-                        category: f[2]?.replace(/"/g,''),  // Matches your categories
-                        city: f[3]?.replace(/"/g,''),      // Matches your city filter
-                        address: f[4]?.replace(/"/g,''),   // Needed for your Map Pins
-                        notes: f[7]?.replace(/"/g,''),     // Matches your card descriptions
+                        name: f[1]?.replace(/"/g,''),
+                        category: f[2]?.replace(/"/g,''),
+                        city: f[3]?.replace(/"/g,''),
+                        address: f[4]?.replace(/"/g,''),
+                        phone: f[5]?.replace(/"/g,''),
+                        hours: f[6]?.replace(/"/g,''),
+                        notes: f[7]?.replace(/"/g,''),
                         image: f[8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-                        link: f[9]?.replace(/"/g,'')       // For your website buttons
+                        website: f[9]?.replace(/"/g,'')
                     };
                 }).filter(s => s.name);
         
-                console.log("Data successfully synced with Sheets");
-                render(); // This triggers your original pins and buttons to draw
+                console.log("✅ Data successfully synced with Sheets");
+                render();
             } catch (e) {
-                console.error("Connection error", e);
+                console.error("❌ Connection error", e);
                 render();
             }
         }
@@ -584,23 +627,49 @@
 
         const CATEGORIES = [
             { id: 'Community', emoji: '📚', name: 'COMMUNITY', subtitle: 'Libraries & warm spaces', image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80' },
-            { id: 'Food', emoji: '🍲', name: 'FOOD', subtitle: 'Meals & food banks', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80' },
+            { id: 'Food', emoji: '🍲', name: 'KAI', subtitle: 'Meals & food banks', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80' },
             { id: 'Whanau', emoji: '👨‍👩‍👧‍👦', name: 'WHĀNAU', subtitle: 'Families & children', image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80' },
             { id: 'Activities', emoji: '🎉', name: 'ACTIVITIES', subtitle: 'Free fun & events', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80' },
             { id: 'Clothing', emoji: '👕', name: 'OP SHOPS', subtitle: 'Affordable clothing', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80' },
             { id: 'Health', emoji: '🏥', name: 'HAUORA', subtitle: 'Health & hygiene facilities', image: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80' },
             { id: 'Legal', emoji: '⚖️', name: 'LEGAL SUPPORT', subtitle: 'Immigration & community law', image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80' },
             { id: 'Transport', emoji: '🚌', name: 'TRANSPORT', subtitle: 'Travel support', image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80' },
-            { id: 'Employment', emoji: '💼', name: 'WORK', subtitle: 'Job support', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80' }
+            { id: 'Employment', emoji: '💼', name: 'MAHI', subtitle: 'Job support', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80' }
         ];
 
-        const CITIES = ['All Cities', 'Auckland', 'Wellington', 'Christchurch', 'Nelson', 'Hamilton'];
+        const CITIES = ['All Cities', 'Auckland Tāmaki Makaurau', 'Wellington Te Whanganui-a-Tara', 'Christchurch Ōtautahi', 'Nelson Whakatū', 'Hamilton Kirikiriroa'];
 
         // === APP STATE ===
         let currentPage = 'home';
         let selectedCity = 'All Cities';
         let selectedCategory = null;
         let selectedService = null;
+
+        // PWA Install Banner Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show banner for Android users
+            if (!localStorage.getItem('installDismissed')) {
+                document.getElementById('installBanner').classList.add('show');
+            }
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('show');
+                });
+            }
+        }
+
+        function dismissBanner() {
+            document.getElementById('installBanner').classList.remove('show');
+            localStorage.setItem('installDismissed', 'true');
+        }
 
         // === RENDER FUNCTIONS ===
         function render() {
@@ -623,6 +692,10 @@
                     <div class="header">
                         <h1>Kai & Care NZ</h1>
                         <p>Kia ora! Find help near you</p>
+                        <p style="font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-top: 15px; font-style: italic; max-width: 700px; margin-left: auto; margin-right: auto;">
+                            "Nāu te rourou, nāku te rourou, ka ora ai te iwi"<br>
+                            <span style="font-size: 0.95rem; opacity: 0.8;">With your basket and my basket, the people will thrive</span>
+                        </p>
                     </div>
                     
                     <div class="city-selector">
@@ -668,7 +741,7 @@
                             <div class="donate-buttons">
                                 <button class="donate-btn" onclick="donate(2)">$2</button>
                                 <button class="donate-btn" onclick="donate(10)">$10</button>
-                                <button class="donate-btn" onclick="donate(10)">$50</button>
+                                <button class="donate-btn donate-btn-custom" onclick="donateCustom()">$50</button>
                             </div>
                             
                             <div class="donate-weekly">
@@ -686,11 +759,10 @@
         function renderCategoryPage() {
             const categoryInfo = CATEGORIES.find(c => c.id === selectedCategory);
             const filteredServices = SERVICES.filter(s => {
-                const cityMatch = selectedCity === 'All Cities' || s.city === selectedCity;
+                const cityMatch = selectedCity === 'All Cities' || s.city.includes(selectedCity.split(' ')[0]);
                 return s.category === selectedCategory && cityMatch;
             });
 
-            // Special handling for Food category - show calendar first
             if (selectedCategory === 'Food') {
                 return renderFoodCalendar();
             }
@@ -698,15 +770,15 @@
             return `
                 <div class="container">
                     <button class="back-button" onclick="goHome()">
-                        ← Back to Menu
+                        ← Hoki / Back to Menu
                     </button>
                     
                     <div class="header">
                         <h1>${categoryInfo.emoji} ${categoryInfo.name}</h1>
                         <p>${selectedCity === 'All Cities' ? 'All locations' : selectedCity}</p>
-                    
+                    </div>
             
-            ${selectedCategory.id === 'Health' ? `
+            ${selectedCategory === 'Health' ? `
             <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                 <h2 style="font-size: 2rem; color: #667eea; margin-bottom: 20px; text-align: center;">🚨 National Helplines - Free & Confidential</h2>
                 
@@ -760,7 +832,7 @@
             </h2>
             ` : ''}
 
-            ${selectedCategory.id === 'Legal' ? `
+            ${selectedCategory === 'Legal' ? `
             <div style="background: white; border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                 <h2 style="font-size: 2rem; color: #667eea; margin-bottom: 20px;">⚖️ Justice of the Peace (JP) - FREE Services</h2>
                 
@@ -796,11 +868,11 @@
                                 <div class="service-card-content">
                                     <h3>${service.name}</h3>
                                     <p>📍 ${service.address}</p>
-                                    <p>⏰ ${service.hours}</p>
+                                    ${service.hours ? `<p>⏰ ${service.hours}</p>` : ''}
                                 </div>
                             </div>
                         `).join('') : `
-                            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #999;">
+                            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: white;">
                                 <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
                                 <p style="font-size: 1.3rem;">No services found in ${selectedCity}</p>
                             </div>
@@ -817,7 +889,7 @@
             return `
                 <div class="container">
                     <button class="back-button" onclick="goBack()">
-                        ← Back
+                        ← Hoki / Back
                     </button>
                     
                     <div class="service-detail">
@@ -864,11 +936,11 @@
                                         📞 Waea / Call
                                     </button>
                                 ` : ''}
-                                    ${service.website ? `
+                                ${service.website ? `
                                     <button class="btn btn-secondary" onclick="window.open('${service.website}', '_blank')" style="background: #4caf50;">
                                         🌐 Visit Website
                                     </button>
-                                    ` : ''}
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -882,12 +954,12 @@
             return `
                 <div class="container">
                     <button class="back-button" onclick="goHome()">
-                        ← Back to Menu
+                        ← Hoki / Back to Menu
                     </button>
                     
                     <div class="calendar-header">
-                        <h2>🍲 Weekly Food Schedule</h2>
-                        <p style="font-size: 1.2rem; color: #666;">Click any meal for more details</p>
+                        <h2>🍲 Weekly Kai Schedule</h2>
+                        <p style="font-size: 1.2rem; color: white;">Click any meal for more details</p>
                     </div>
                     
                     <div class="calendar-grid">
@@ -912,7 +984,7 @@
                     
                     <div style="text-align: center; margin-top: 50px;">
                         <button class="btn btn-primary" onclick="showFoodServices()">
-                            📍 View All Food Services
+                            📍 View All Kai Services
                         </button>
                     </div>
                 </div>
@@ -955,6 +1027,7 @@
         }
 
         function showFoodServices() {
+            selectedCategory = 'Food';
             currentPage = 'category';
             render();
         }
@@ -971,7 +1044,7 @@
         function suggestService() {
             const subject = 'New Service Suggestion';
             const body = `
-I would like to suggest a new service for the Community Services NZ directory:
+I would like to suggest a new service for the Kai & Care NZ directory:
 
 Service Name: 
 Category: 
@@ -984,13 +1057,27 @@ Notes:
 My Email: 
             `.trim();
             
-            // ELENA: Replace with your email
-            window.location.href = `mailto:YOUR_EMAIL@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = `mailto:fieldnotes.studio36@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function shareApp() {
+            const shareData = {
+                title: 'Kai & Care NZ',
+                text: 'Find free and low-cost community services in New Zealand - kai banks, op shops, hauora services, and more!',
+                url: 'https://fieldnotesstudio36-bit.github.io/kai-care-nz/'
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData);
+            } else {
+                navigator.clipboard.writeText(shareData.url).then(() => {
+                    alert('Link copied to clipboard! Share it with your whānau and friends. 💙');
+                });
+            }
         }
         
         // DONATION FUNCTIONS
         function donate(amount) {
-            // Different Stripe links for different amounts
             const links = {
                 2: 'https://buy.stripe.com/14AcN4861awP505dHs7IY03',
                 10: 'https://buy.stripe.com/dRmaEWae96gzakp6f07IY02'
@@ -999,16 +1086,14 @@ My Email:
         }
         
         function donateCustom() {
-            // $50 adjustable amount link
             window.open('https://buy.stripe.com/9B6dR84TP5cvakp7j47IY04', '_blank');
         }
         
         function donateWeekly() {
-            // $5/month recurring subscription
             window.open('https://buy.stripe.com/9B66oG1HD6gz0JPbzk7IY01', '_blank');
         }
 
-        // Initialize app - Load from Google Sheets
+        // Initialize app
         console.log('🚀 App starting...');
         document.getElementById('app').innerHTML = `
             <div style="text-align: center; padding: 100px 20px; color: white;">
@@ -1019,7 +1104,7 @@ My Email:
         `;
         loadServicesFromSheet();
 
-        // Register service worker for PWA functionality
+        // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/kai-care-nz/service-worker.js')
                 .then(() => console.log('✅ Service Worker registered'))

@@ -1,0 +1,76 @@
+{
+    "Monday": [
+        {
+            "name": "Nelson City Mission Community Lunch",
+            "time": "12:00pm - 1:30pm",
+            "price": "Free",
+            "location": "46 Waimea Road, Nelson"
+        },
+        {
+            "name": "Salvation Army Dinner",
+            "time": "5:00pm - 6:30pm",
+            "price": "Koha/Donation",
+            "location": "18 Selwyn Place, Nelson"
+        }
+    ],
+    "Tuesday": [
+        {
+            "name": "Community Kai at St John's Church",
+            "time": "6:00pm - 7:00pm",
+            "price": "Free",
+            "location": "3 Vanguard Street, Nelson"
+        }
+    ],
+    "Wednesday": [
+        {
+            "name": "Nelson City Mission Community Lunch",
+            "time": "12:00pm - 1:30pm",
+            "price": "Free",
+            "location": "46 Waimea Road, Nelson"
+        },
+        {
+            "name": "Victory Community Centre Dinner",
+            "time": "5:30pm - 7:00pm",
+            "price": "$3",
+            "location": "Rutherford Park, Nelson"
+        }
+    ],
+    "Thursday": [
+        {
+            "name": "Elim Church Community Meal",
+            "time": "5:00pm - 6:30pm",
+            "price": "Free",
+            "location": "26 Halifax Street, Nelson"
+        }
+    ],
+    "Friday": [
+        {
+            "name": "Nelson City Mission Community Lunch",
+            "time": "12:00pm - 1:30pm",
+            "price": "Free",
+            "location": "46 Waimea Road, Nelson"
+        },
+        {
+            "name": "Salvation Army Dinner",
+            "time": "5:00pm - 6:30pm",
+            "price": "Koha/Donation",
+            "location": "18 Selwyn Place, Nelson"
+        }
+    ],
+    "Saturday": [
+        {
+            "name": "Community Breakfast at Cathedral",
+            "time": "9:00am - 10:30am",
+            "price": "Free",
+            "location": "Trafalgar Square, Nelson"
+        }
+    ],
+    "Sunday": [
+        {
+            "name": "Sunday Roast at Victory Centre",
+            "time": "12:30pm - 2:00pm",
+            "price": "$4",
+            "location": "Rutherford Park, Nelson"
+        }
+    ]
+}

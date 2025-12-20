@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find free and low-cost community services in New Zealand - food banks, op shops, health services, and more">
+    <meta name="theme-color" content="#1a2332">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=180&q=80">
     <title>Kai & Care NZ - Find Help Near You</title>
     <style>
         * {
@@ -715,7 +719,7 @@
                             
                             <div class="donate-weekly">
                                 <p>Or become a regular supporter:</p>
-                                <button class="donate-btn-weekly" onclick="donateWeekly()">$5/week</button>
+                                <button class="donate-btn-weekly" onclick="donateWeekly()">$5/month</button>
                             </div>
                             
                             <p style="font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-top: 15px;">Every dollar helps us maintain and expand this service</p>
@@ -1032,24 +1036,22 @@ My Email:
         
         // DONATION FUNCTIONS
         function donate(amount) {
-            // ELENA: Replace with your Stripe payment link for one-time donations
-            // You can create this in your Stripe Dashboard -> Payment Links
-            // Add ?prefilled_amount=200 for $2 or ?prefilled_amount=1000 for $10 (amounts in cents)
-            const stripeLink = 'YOUR_STRIPE_PAYMENT_LINK_HERE';
-            window.open(`${stripeLink}?prefilled_amount=${amount * 100}`, '_blank');
+            // Different Stripe links for different amounts
+            const links = {
+                2: 'https://buy.stripe.com/14AcN4861awP505dHs7IY03',
+                10: 'https://buy.stripe.com/dRmaEWae96gzakp6f07IY02'
+            };
+            window.open(links[amount], '_blank');
         }
         
         function donateCustom() {
-            // ELENA: Replace with your Stripe payment link for custom amount donations
-            const stripeLink = 'YOUR_STRIPE_PAYMENT_LINK_HERE';
-            window.open(stripeLink, '_blank');
+            // $50 adjustable amount link
+            window.open('https://buy.stripe.com/9B6dR84TP5cvakp7j47IY04', '_blank');
         }
         
         function donateWeekly() {
-            // ELENA: Replace with your Stripe subscription link for weekly $5 donations
-            // Create this in Stripe Dashboard -> Payment Links -> Create for recurring payment
-            const stripeSubscriptionLink = 'YOUR_STRIPE_WEEKLY_SUBSCRIPTION_LINK_HERE';
-            window.open(stripeSubscriptionLink, '_blank');
+            // $5/month recurring subscription
+            window.open('https://buy.stripe.com/9B66oG1HD6gz0JPbzk7IY01', '_blank');
         }
 
         // Initialize app - Load from Google Sheets
@@ -1062,6 +1064,13 @@ My Email:
             </div>
         `;
         loadServicesFromSheet();
+
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/kai-care-nz/service-worker.js')
+                .then(() => console.log('✅ Service Worker registered'))
+                .catch((error) => console.log('Service Worker registration failed:', error));
+        }
     </script>
 </body>
 </html>

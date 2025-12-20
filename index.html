@@ -82,7 +82,7 @@
 
         async function loadServicesFromSheet() {
             try {
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+                const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vShhl35046lXVNAsV2xTxYeSlxOK7w2gGI9jSxS6-7ZkjwuizZrcuRKgrjmW70D6wmEhFCRPEmyquj4/pub?output=csv`;
                 const response = await fetch(url);
                 const csvText = await response.text();
                 const lines = csvText.split('\n').slice(1);

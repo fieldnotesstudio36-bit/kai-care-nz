@@ -60,6 +60,7 @@
             background: white;
             cursor: pointer;
             font-weight: 600;
+            margin-bottom: 15px;
         }
         
         /* Category Grid - Image Cards */
@@ -275,7 +276,7 @@
         
         .calendar-header h2 {
             font-size: 2.5rem;
-            color: #333;
+            color: white;
             margin-bottom: 10px;
         }
         
@@ -536,67 +537,70 @@
     <script>
         // GOOGLE SHEETS CONFIGURATION
         const SHEET_ID = '11c4SKLiwgM-sv1RHxj8JBGMa-PkcLpujpYEM69sbgm8';
-        const SHEET_NAME = 'Services';
-        let SERVICES = [];
+        let ALL_SERVICES = {};
 
-        // CSV parser helper function
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                const nextChar = line[i + 1];
-                
-                if (char === '"') {
-                    if (inQuotes && nextChar === '"') {
-                        current += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current.trim());
-            return result;
-        }
+        // GID numbers for each city tab
+        const CITY_GIDS = {
+            'Nelson': '0',
+            'Hamilton': '1135954100',
+            'Auckland': '193742870',
+            'Wellington': '1964138136',
+            'Christchurch': '1375191415'
+        };
 
-        async function loadServicesFromSheet() {
+        // Auckland district display names
+        const AUCKLAND_DISTRICTS = {
+            'Central': 'Central (CBD, Grey Lynn, Ponsonby, Parnell, Newmarket)',
+            'North': 'North Shore (Takapuna, Albany, Devonport, Birkenhead)',
+            'West': 'West (Henderson, New Lynn, Glen Eden, Titirangi)',
+            'South': 'South (Manukau, Papakura, Pukekohe, Otara)',
+            'East': 'East (Howick, Pakuranga, Botany, Bucklands Beach)'
+        };
+
+        async function loadCityServices(cityName) {
             try {
-                const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vShhl35046lXVNAsV2xTxYeSlxOK7w2gGI9jSxS6-7ZkjwuizZrcuRKgrjmW70D6wmEhFCRPEmyquj4/pub?output=csv`;
+                const gid = CITY_GIDS[cityName];
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
                 
                 const response = await fetch(url);
                 const csvText = await response.text();
                 
-                const lines = csvText.split('\n').slice(1);
-                SERVICES = lines.map((line, index) => {
+                const lines = csvText.split('\n').slice(1); // Skip header
+                const isAuckland = cityName === 'Auckland';
+                
+                const services = lines.map((line, index) => {
+                    if (!line.trim()) return null;
                     const f = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    
                     return {
                         id: index,
                         name: f[1]?.replace(/"/g,''),
                         category: f[2]?.replace(/"/g,''),
                         city: f[3]?.replace(/"/g,''),
-                        address: f[4]?.replace(/"/g,''),
-                        phone: f[5]?.replace(/"/g,''),
-                        hours: f[6]?.replace(/"/g,''),
-                        notes: f[7]?.replace(/"/g,''),
-                        image: f[8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-                        website: f[9]?.replace(/"/g,'')
+                        district: isAuckland ? f[4]?.replace(/"/g,'') : null,
+                        address: f[isAuckland ? 5 : 4]?.replace(/"/g,''),
+                        phone: f[isAuckland ? 6 : 5]?.replace(/"/g,''),
+                        hours: f[isAuckland ? 7 : 6]?.replace(/"/g,''),
+                        notes: f[isAuckland ? 8 : 7]?.replace(/"/g,''),
+                        image: f[isAuckland ? 9 : 8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+                        website: f[isAuckland ? 10 : 9]?.replace(/"/g,'')
                     };
-                }).filter(s => s.name);
+                }).filter(s => s && s.name);
         
-                console.log("✅ Data successfully synced with Sheets");
-                render();
+                ALL_SERVICES[cityName] = services;
+                console.log(`✅ Loaded ${services.length} services for ${cityName}`);
+                return services;
             } catch (e) {
-                console.error("❌ Connection error", e);
-                render();
+                console.error(`❌ Error loading ${cityName}:`, e);
+                ALL_SERVICES[cityName] = [];
+                return [];
             }
+        }
+
+        async function loadAllCities() {
+            const cityNames = Object.keys(CITY_GIDS);
+            await Promise.all(cityNames.map(city => loadCityServices(city)));
+            render();
         }
 
         const FOOD_CALENDAR = {
@@ -637,11 +641,12 @@
             { id: 'Employment', emoji: '💼', name: 'MAHI', subtitle: 'Job support', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80' }
         ];
 
-        const CITIES = ['All Cities', 'Auckland Tāmaki Makaurau', 'Wellington Te Whanganui-a-Tara', 'Christchurch Ōtautahi', 'Nelson Whakatū', 'Hamilton Kirikiriroa'];
+        const CITIES = ['Auckland', 'Wellington', 'Christchurch', 'Nelson', 'Hamilton'];
 
         // === APP STATE ===
         let currentPage = 'home';
-        let selectedCity = 'All Cities';
+        let selectedCity = 'Nelson';
+        let selectedDistrict = null;
         let selectedCategory = null;
         let selectedService = null;
 
@@ -650,7 +655,6 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Show banner for Android users
             if (!localStorage.getItem('installDismissed')) {
                 document.getElementById('installBanner').classList.add('show');
             }
@@ -687,6 +691,8 @@
         }
 
         function renderHome() {
+            const showDistrictSelector = selectedCity === 'Auckland';
+            
             return `
                 <div class="container">
                     <div class="header">
@@ -706,6 +712,17 @@
                                 </option>
                             `).join('')}
                         </select>
+                        
+                        ${showDistrictSelector ? `
+                            <select onchange="changeDistrict(this.value)">
+                                <option value="">All Auckland Districts</option>
+                                ${Object.keys(AUCKLAND_DISTRICTS).map(key => `
+                                    <option value="${key}" ${selectedDistrict === key ? 'selected' : ''}>
+                                        ${AUCKLAND_DISTRICTS[key]}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        ` : ''}
                     </div>
                     
                     <div class="category-grid">
@@ -758,10 +775,17 @@
 
         function renderCategoryPage() {
             const categoryInfo = CATEGORIES.find(c => c.id === selectedCategory);
-            const filteredServices = SERVICES.filter(s => {
-                const cityMatch = selectedCity === 'All Cities' || s.city.includes(selectedCity.split(' ')[0]);
-                return s.category === selectedCategory && cityMatch;
-            });
+            
+            // Filter services by city, district (if Auckland), and category
+            let filteredServices = ALL_SERVICES[selectedCity] || [];
+            
+            // Auckland district filter
+            if (selectedCity === 'Auckland' && selectedDistrict) {
+                filteredServices = filteredServices.filter(s => s.district === selectedDistrict);
+            }
+            
+            // Category filter
+            filteredServices = filteredServices.filter(s => s.category === selectedCategory);
 
             if (selectedCategory === 'Food') {
                 return renderFoodCalendar();
@@ -775,7 +799,7 @@
                     
                     <div class="header">
                         <h1>${categoryInfo.emoji} ${categoryInfo.name}</h1>
-                        <p>${selectedCity === 'All Cities' ? 'All locations' : selectedCity}</p>
+                        <p>${selectedCity}${selectedDistrict ? ` - ${AUCKLAND_DISTRICTS[selectedDistrict]}` : ''}</p>
                     </div>
             
             ${selectedCategory === 'Health' ? `
@@ -828,7 +852,7 @@
             </div>
 
             <h2 style="color: white; font-size: 2rem; margin: 30px 0 20px; text-align: center;">
-                Nelson-Richmond-Motueka Health Services
+                ${selectedCity} Health Services
             </h2>
             ` : ''}
 
@@ -850,14 +874,14 @@
                     <h3 style="font-size: 1.4rem; color: #333; margin-bottom: 15px;">How to Find a JP:</h3>
                     <ol style="font-size: 1.1rem; line-height: 2; color: #666;">
                         <li>Visit <a href="https://justiceofthepeace.org.nz" target="_blank" style="color: #4caf50;">justiceofthepeace.org.nz</a> and search by location</li>
-                        <li>Check Nelson Public Library or Richmond Library websites for JP service times</li>
+                        <li>Check your local library for JP service times</li>
                         <li>Citizens Advice Bureau often has JPs available</li>
                     </ol>
                 </div>
             </div>
 
             <h2 style="color: white; font-size: 2rem; margin: 30px 0 20px; text-align: center;">
-                Nelson Legal Support Services
+                ${selectedCity} Legal Support Services
             </h2>
             ` : ''}
             
@@ -874,7 +898,7 @@
                         `).join('') : `
                             <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: white;">
                                 <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
-                                <p style="font-size: 1.3rem;">No services found in ${selectedCity}</p>
+                                <p style="font-size: 1.3rem;">No services found in ${selectedCity}${selectedDistrict ? ` - ${AUCKLAND_DISTRICTS[selectedDistrict]}` : ''}</p>
                             </div>
                         `}
                     </div>
@@ -883,7 +907,8 @@
         }
 
         function renderServiceDetail() {
-            const service = SERVICES.find(s => s.id === selectedService);
+            const cityServices = ALL_SERVICES[selectedCity] || [];
+            const service = cityServices.find(s => s.id === selectedService);
             if (!service) return '';
 
             return `
@@ -968,7 +993,7 @@
                                 <h3>${day}</h3>
                                 ${FOOD_CALENDAR[day] && FOOD_CALENDAR[day].length > 0 ? 
                                     FOOD_CALENDAR[day].map(meal => `
-                                        <div class="meal-entry" onclick="${meal.serviceId ? `openService(${meal.serviceId})` : ''}">
+                                        <div class="meal-entry" ${meal.serviceId ? `onclick="openService(${meal.serviceId})"` : ''}>
                                             <div class="meal-name">${meal.name}</div>
                                             <div class="meal-info">⏰ ${meal.time}</div>
                                             <div class="meal-info" style="color: #4caf50; font-weight: 600;">💰 ${meal.price}</div>
@@ -980,12 +1005,6 @@
                                 }
                             </div>
                         `).join('')}
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 50px;">
-                        <button class="btn btn-primary" onclick="showFoodServices()">
-                            📍 View All Kai Services
-                        </button>
                     </div>
                 </div>
             `;
@@ -1011,6 +1030,12 @@
 
         function changeCity(city) {
             selectedCity = city;
+            selectedDistrict = null;
+            render();
+        }
+
+        function changeDistrict(district) {
+            selectedDistrict = district || null;
             render();
         }
 
@@ -1023,12 +1048,6 @@
         function openService(serviceId) {
             selectedService = serviceId;
             currentPage = 'service';
-            render();
-        }
-
-        function showFoodServices() {
-            selectedCategory = 'Food';
-            currentPage = 'category';
             render();
         }
 
@@ -1102,7 +1121,7 @@ My Email:
                 <div style="font-size: 3rem;">⏳</div>
             </div>
         `;
-        loadServicesFromSheet();
+        loadAllCities();
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {

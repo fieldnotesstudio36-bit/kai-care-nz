@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#1a2332">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=180&q=80">
-    <title>Help Hub NZ - Find Help Near You</title>
+    <title>Kai & Care NZ - Find Help Near You</title>
     <style>
         * {
             margin: 0;
@@ -525,7 +525,7 @@
     
     <!-- Install Banner for Android -->
     <div id="installBanner" class="install-banner">
-        <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>📱 Install Help Hub NZ</strong></p>
+        <p style="font-size: 1.2rem; margin-bottom: 10px;"><strong>📱 Install Kai & Care NZ</strong></p>
         <p style="font-size: 1rem; margin-bottom: 10px;">Add this app to your home screen for easy access!</p>
         <button onclick="installApp()">Install Now</button>
         <button onclick="dismissBanner()" style="background: transparent; border: 2px solid white; color: white;">Maybe Later</button>
@@ -565,30 +565,68 @@
                 const response = await fetch(url);
                 const csvText = await response.text();
                 
-                const lines = csvText.split('\n').slice(1); // Skip header
-                const isAuckland = cityName === 'Auckland';
+                const lines = csvText.split('\n');
+                const header = lines[0].toLowerCase(); // Get header to check structure
+                const hasDistrict = header.includes('district');
+                const dataLines = lines.slice(1); // Skip header
                 
-                const services = lines.map((line, index) => {
+                const services = dataLines.map((line, index) => {
                     if (!line.trim()) return null;
-                    const f = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     
-                    return {
-                        id: index,
-                        name: f[1]?.replace(/"/g,''),
-                        category: f[2]?.replace(/"/g,''),
-                        city: f[3]?.replace(/"/g,''),
-                        district: isAuckland ? f[4]?.replace(/"/g,'') : null,
-                        address: f[isAuckland ? 5 : 4]?.replace(/"/g,''),
-                        phone: f[isAuckland ? 6 : 5]?.replace(/"/g,''),
-                        hours: f[isAuckland ? 7 : 6]?.replace(/"/g,''),
-                        notes: f[isAuckland ? 8 : 7]?.replace(/"/g,''),
-                        image: f[isAuckland ? 9 : 8]?.replace(/"/g,'') || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
-                        website: f[isAuckland ? 10 : 9]?.replace(/"/g,'')
-                    };
-                }).filter(s => s && s.name);
+                    // Better CSV parsing - handles quotes properly
+                    const f = [];
+                    let current = '';
+                    let inQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            f.push(current);
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    f.push(current); // Add last field
+                    
+                    // Column mapping based on whether city has district column
+                    if (hasDistrict) {
+                        // Auckland structure: id, name, category, city, district, address, phone, hours, notes, image, website
+                        return {
+                            id: index,
+                            name: f[1]?.replace(/"/g,'').trim(),
+                            category: f[2]?.replace(/"/g,'').trim(),
+                            city: f[3]?.replace(/"/g,'').trim(),
+                            district: f[4]?.replace(/"/g,'').trim(),
+                            address: f[5]?.replace(/"/g,'').trim(),
+                            phone: f[6]?.replace(/"/g,'').trim(),
+                            hours: f[7]?.replace(/"/g,'').trim(),
+                            notes: f[8]?.replace(/"/g,'').trim(),
+                            image: f[9]?.replace(/"/g,'').trim() || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+                            website: f[10]?.replace(/"/g,'').trim()
+                        };
+                    } else {
+                        // Other cities structure: id, name, category, city, address, phone, hours, notes, image, website
+                        return {
+                            id: index,
+                            name: f[1]?.replace(/"/g,'').trim(),
+                            category: f[2]?.replace(/"/g,'').trim(),
+                            city: f[3]?.replace(/"/g,'').trim(),
+                            district: null,
+                            address: f[4]?.replace(/"/g,'').trim(),
+                            phone: f[5]?.replace(/"/g,'').trim(),
+                            hours: f[6]?.replace(/"/g,'').trim(),
+                            notes: f[7]?.replace(/"/g,'').trim(),
+                            image: f[8]?.replace(/"/g,'').trim() || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+                            website: f[9]?.replace(/"/g,'').trim()
+                        };
+                    }
+                }).filter(s => s && s.name && s.name.length > 0);
         
                 ALL_SERVICES[cityName] = services;
-                console.log(`✅ Loaded ${services.length} services for ${cityName}`);
+                console.log(`✅ Loaded ${services.length} services for ${cityName} (District column: ${hasDistrict})`);
                 return services;
             } catch (e) {
                 console.error(`❌ Error loading ${cityName}:`, e);
@@ -696,7 +734,7 @@
             return `
                 <div class="container">
                     <div class="header">
-                        <h1>Help Hub NZ</h1>
+                        <h1>Kai & Care NZ</h1>
                         <p>Kia ora! Find help near you</p>
                         <p style="font-size: 1.1rem; color: rgba(255,255,255,0.85); margin-top: 15px; font-style: italic; max-width: 700px; margin-left: auto; margin-right: auto;">
                             "Nāu te rourou, nāku te rourou, ka ora ai te iwi"<br>
@@ -752,7 +790,7 @@
                     <!-- Donate Section -->
                     <div class="donate-section">
                         <div class="donate-card">
-                            <h2>💝 Support Help Hub NZ</h2>
+                            <h2>💝 Support Kai & Care NZ</h2>
                             <p>We do our best to keep this free for everyone. If you love what we do, help us keep going!</p>
                             
                             <div class="donate-buttons">
@@ -1063,7 +1101,7 @@
         function suggestService() {
             const subject = 'New Service Suggestion';
             const body = `
-I would like to suggest a new service for the Help Hub NZ directory:
+I would like to suggest a new service for the Kai & Care NZ directory:
 
 Service Name: 
 Category: 
@@ -1081,7 +1119,7 @@ My Email:
 
         function shareApp() {
             const shareData = {
-                title: 'Help Hub NZ',
+                title: 'Kai & Care NZ',
                 text: 'Find free and low-cost community services in New Zealand - kai banks, op shops, hauora services, and more!',
                 url: 'https://fieldnotesstudio36-bit.github.io/kai-care-nz/'
             };
@@ -1116,7 +1154,7 @@ My Email:
         console.log('🚀 App starting...');
         document.getElementById('app').innerHTML = `
             <div style="text-align: center; padding: 100px 20px; color: white;">
-                <h1 style="font-size: 3rem; margin-bottom: 20px;">Help Hub NZ</h1>
+                <h1 style="font-size: 3rem; margin-bottom: 20px;">Kai & Care NZ</h1>
                 <p style="font-size: 1.5rem; margin-bottom: 30px;">Loading services from Google Sheets...</p>
                 <div style="font-size: 3rem;">⏳</div>
             </div>

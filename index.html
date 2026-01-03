@@ -564,11 +564,18 @@
                 const gid = CITY_GIDS[cityName];
                 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
                 
+                console.log(`📥 Fetching ${cityName} from GID ${gid}...`);
+                console.log(`   URL: ${url}`);
+                
                 const response = await fetch(url);
                 const csvText = await response.text();
                 
+                console.log(`📄 ${cityName} CSV length: ${csvText.length} characters`);
+                
                 const lines = csvText.split('\n');
                 const header = lines[0].toLowerCase(); // Get header to check structure
+                console.log(`   Header: ${header.substring(0, 100)}...`);
+                
                 const hasDistrict = header.includes('district');
                 const dataLines = lines.slice(1); // Skip header
                 

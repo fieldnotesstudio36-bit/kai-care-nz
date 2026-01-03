@@ -1198,6 +1198,10 @@ My Email:
                 <div style="font-size: 3rem;">⏳</div>
             </div>
         `;
+        
+        // Set initial history state
+        history.replaceState({ page: 'home' }, '', '#home');
+        
         loadAllCities();
 
         // Register service worker for PWA

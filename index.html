@@ -1034,6 +1034,14 @@
                         <p style="font-size: 1.2rem; color: white;">Click any meal for more details</p>
                     </div>
                     
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <a href="/kai-care-nz/Kai_Food_Support_Agencies_2024.pdf" 
+                           target="_blank" 
+                           style="display: inline-block; padding: 20px 40px; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; text-decoration: none; border-radius: 12px; font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: all 0.3s ease;">
+                            📄 Food Parcels from Community Food Bank & Other Low-Cost Kai Options
+                        </a>
+                    </div>
+                    
                     <div class="calendar-grid">
                         ${days.map(day => `
                             <div class="day-column">
@@ -1057,11 +1065,12 @@
             `;
         }
 
-        // === NAVIGATION FUNCTIONS ===
+// === NAVIGATION FUNCTIONS ===
         function goHome() {
             currentPage = 'home';
             selectedCategory = null;
             selectedService = null;
+            history.pushState({ page: 'home' }, '', '#home');
             render();
         }
 
@@ -1069,6 +1078,7 @@
             if (currentPage === 'service') {
                 currentPage = 'category';
                 selectedService = null;
+                history.pushState({ page: 'category', category: selectedCategory }, '', `#${selectedCategory}`);
             } else {
                 goHome();
             }
@@ -1078,25 +1088,45 @@
         function changeCity(city) {
             selectedCity = city;
             selectedDistrict = null;
+            history.pushState({ page: 'home', city: city }, '', `#home-${city}`);
             render();
         }
 
         function changeDistrict(district) {
             selectedDistrict = district || null;
+            history.pushState({ page: 'home', city: selectedCity, district: district }, '', `#home-${selectedCity}-${district || 'all'}`);
             render();
         }
 
         function openCategory(categoryId) {
             selectedCategory = categoryId;
             currentPage = categoryId === 'Food' ? 'calendar' : 'category';
+            history.pushState({ page: currentPage, category: categoryId }, '', `#${categoryId}`);
             render();
         }
 
         function openService(serviceId) {
             selectedService = serviceId;
             currentPage = 'service';
+            history.pushState({ page: 'service', service: serviceId, category: selectedCategory }, '', `#service-${serviceId}`);
             render();
         }
+
+        // Listen for browser back/forward button
+        window.addEventListener('popstate', (event) => {
+            if (event.state) {
+                // Restore state from history
+                currentPage = event.state.page || 'home';
+                selectedCategory = event.state.category || null;
+                selectedService = event.state.service || null;
+                selectedCity = event.state.city || selectedCity;
+                selectedDistrict = event.state.district || null;
+                render();
+            } else {
+                // No state, go home
+                goHome();
+            }
+        });
 
         function getDirections(address, city) {
             const query = encodeURIComponent(`${address}, ${city}, New Zealand`);
